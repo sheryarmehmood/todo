@@ -1,54 +1,58 @@
 <template>
-  <div class="tasks">
-    <h1>To-Do List</h1>
-    <form @submit.prevent="addTask" class="task-form">
-      <input v-model="newTask" placeholder="Enter a task" />
-      <button type="submit">Add</button>
-    </form>
-    <ul class="task-list">
-      <li v-for="task in tasks" :key="task.id">
-        <span
-          :class="{ completed: task.is_completed }"
-          @click="toggleTask(task)"
-        >
-          {{ task.description }}
-        </span>
-        <button @click="deleteTask(task.id)">Delete</button>
-      </li>
-    </ul>
+  <div class="page-container">
+    <div class="todo-container">
+      <h1 class="title">ToDo List!</h1>
+      <form @submit.prevent="addTask" class="todo-form">
+        <input
+          v-model="newTask"
+          type="text"
+          placeholder="Add your new ToDo..."
+          class="todo-input"
+        />
+        <button type="submit" class="add-button">+</button>
+      </form>
+      <ul class="todo-list">
+        <li v-for="task in tasks" :key="task.id" class="todo-item">
+          <span :class="{ completed: task.is_completed }">{{ task.description }}</span>
+          <div class="todo-actions">
+            <button class="complete-button" @click="toggleTask(task)">✔</button>
+            <button class="edit-button" @click="editTask(task)">✎</button>
+            <button class="delete-button" @click="deleteTask(task.id)">🗑</button>
+          </div>
+        </li>
+      </ul>
+    </div>
   </div>
 </template>
 
 <script>
-import axios from 'axios';
+import axios from "axios";
 
 export default {
-  name: 'Tasks',
+  name: "Tasks",
   data() {
     return {
       tasks: [],
-      newTask: '',
+      newTask: "",
     };
   },
   methods: {
     async fetchTasks() {
       try {
-        const response = await axios.get('/api/tasks');
+        const response = await axios.get("/api/tasks");
         this.tasks = response.data;
       } catch (error) {
-        console.error('Error fetching tasks:', error);
+        console.error("Error fetching tasks:", error);
       }
     },
     async addTask() {
       if (!this.newTask.trim()) return;
       try {
-        const response = await axios.post('/api/tasks', {
-          description: this.newTask,
-        });
+        const response = await axios.post("/api/tasks", { description: this.newTask });
         this.tasks.push(response.data);
-        this.newTask = '';
+        this.newTask = "";
       } catch (error) {
-        console.error('Error adding task:', error);
+        console.error("Error adding task:", error);
       }
     },
     async toggleTask(task) {
@@ -56,7 +60,7 @@ export default {
         const response = await axios.put(`/api/tasks/${task.id}`);
         task.is_completed = response.data.is_completed;
       } catch (error) {
-        console.error('Error toggling task:', error);
+        console.error("Error toggling task:", error);
       }
     },
     async deleteTask(id) {
@@ -64,8 +68,12 @@ export default {
         await axios.delete(`/api/tasks/${id}`);
         this.tasks = this.tasks.filter((task) => task.id !== id);
       } catch (error) {
-        console.error('Error deleting task:', error);
+        console.error("Error deleting task:", error);
       }
+    },
+    editTask(task) {
+      this.newTask = task.description;
+      this.deleteTask(task.id);
     },
   },
   mounted() {
@@ -74,62 +82,120 @@ export default {
 };
 </script>
 
-<style>
-.tasks {
-  margin: 20px;
-}
-.task-form {
+<style scoped>
+/* Full Page Green Background */
+.page-container {
+  background-color: #1abc9c; /* Green background */
+  min-height: 100vh; /* Full height of the viewport */
   display: flex;
-  gap: 10px;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+/* To-Do List Container */
+.todo-container {
+  background-color: #ecf0f1; /* Light grey background */
+  padding: 30px;
+  border-radius: 15px;
+  width: 400px;
+  text-align: center;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Title */
+.title {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  color: #2c3e50; /* Dark text */
+}
+
+/* To-Do Form */
+.todo-form {
+  display: flex;
+  justify-content: space-between;
   margin-bottom: 20px;
 }
-.task-form input {
-  flex: 1;
+
+.todo-input {
   padding: 10px;
-  border: 1px solid #ccc;
+  flex: 1;
+  border: 1px solid #bdc3c7;
   border-radius: 5px;
+  font-size: 16px;
+  margin-right: 10px;
 }
-.task-form button {
-  padding: 10px 20px;
-  background-color: #007bff;
-  color: #fff;
+
+.add-button {
+  background-color: #8e44ad; /* Purple button */
+  color: white;
   border: none;
-  border-radius: 5px;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  font-size: 18px;
   cursor: pointer;
 }
-.task-form button:hover {
-  background-color: #0056b3;
+
+.add-button:hover {
+  background-color: #732d91;
 }
-.task-list {
+
+/* To-Do List */
+.todo-list {
   list-style: none;
   padding: 0;
+  margin: 0;
 }
-.task-list li {
+
+.todo-item {
+  background-color: #ffffff; /* White background for items */
+  padding: 10px;
+  border-radius: 5px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
   margin-bottom: 10px;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
 }
-.task-list li .completed {
+
+.todo-item .completed {
   text-decoration: line-through;
-  color: #999;
-  cursor: pointer;
+  color: #7f8c8d; /* Grey color for completed tasks */
 }
-.task-list li span {
-  cursor: pointer;
-}
-.task-list li button {
-  background-color: #dc3545;
-  color: #fff;
+
+/* To-Do Actions */
+.todo-actions button {
+  background-color: transparent;
   border: none;
-  border-radius: 5px;
-  padding: 5px 10px;
+  font-size: 18px;
   cursor: pointer;
+  margin-left: 5px;
 }
-.task-list li button:hover {
-  background-color: #c82333;
+
+.complete-button {
+  color: #27ae60; /* Green for complete */
+}
+
+.edit-button {
+  color: #f1c40f; /* Yellow for edit */
+}
+
+.delete-button {
+  color: #e74c3c; /* Red for delete */
+}
+
+.complete-button:hover {
+  color: #219150;
+}
+
+.edit-button:hover {
+  color: #d4ac0d;
+}
+
+.delete-button:hover {
+  color: #c0392b;
 }
 </style>
