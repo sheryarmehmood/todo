@@ -16,7 +16,7 @@
           <span :class="{ completed: task.is_completed }">{{ task.description }}</span>
           <div class="todo-actions">
             <button class="complete-button" @click="toggleTask(task)">✔</button>
-            <button class="edit-button" @click="editTask(task)">✎</button>
+            <!-- <button class="edit-button" @click="editTask(task)">✎</button> -->
             <button class="delete-button" @click="deleteTask(task.id)">🗑</button>
           </div>
         </li>
@@ -99,7 +99,7 @@ export default {
   background-color: #ecf0f1; /* Light grey background */
   padding: 30px;
   border-radius: 15px;
-  width: 400px;
+  width: 700px;
   text-align: center;
   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
 }
@@ -132,7 +132,7 @@ export default {
   background-color: #8e44ad; /* Purple button */
   color: white;
   border: none;
-  border-radius: 50%;
+  border-radius: 10%;
   width: 40px;
   height: 40px;
   font-size: 18px;
@@ -179,9 +179,9 @@ export default {
   color: #27ae60; /* Green for complete */
 }
 
-.edit-button {
-  color: #f1c40f; /* Yellow for edit */
-}
+/* .edit-button {
+  color: #f1c40f; 
+} */
 
 .delete-button {
   color: #e74c3c; /* Red for delete */
