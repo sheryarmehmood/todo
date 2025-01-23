@@ -2,6 +2,12 @@
   <div class="page-container">
     <div class="todo-container">
       <h1 class="title">ToDo List!</h1>
+
+      <!-- Notification Section -->
+      <div v-if="message.text" :class="`notification ${message.type}`">
+        {{ message.text }}
+      </div>
+
       <form @submit.prevent="addTask" class="todo-form">
         <input
           v-model="newTask"
@@ -16,7 +22,6 @@
           <span :class="{ completed: task.is_completed }">{{ task.description }}</span>
           <div class="todo-actions">
             <button class="complete-button" @click="toggleTask(task)">✔</button>
-            <!-- <button class="edit-button" @click="editTask(task)">✎</button> -->
             <button class="delete-button" @click="deleteTask(task.id)">🗑</button>
           </div>
         </li>
@@ -34,6 +39,10 @@ export default {
     return {
       tasks: [],
       newTask: "",
+      message: {
+        text: "",
+        type: "", // 'success' or 'error'
+      },
     };
   },
   methods: {
@@ -41,39 +50,53 @@ export default {
       try {
         const response = await axios.get("/api/tasks");
         this.tasks = response.data;
+        this.showMessage("Tasks fetched successfully!", "success");
       } catch (error) {
-        console.error("Error fetching tasks:", error);
+        this.showMessage("Error fetching tasks.", "error");
+        console.error(error);
       }
     },
     async addTask() {
-      if (!this.newTask.trim()) return;
+      if (!this.newTask.trim()) {
+        this.showMessage("Task description cannot be empty.", "error");
+        return;
+      }
       try {
         const response = await axios.post("/api/tasks", { description: this.newTask });
         this.tasks.push(response.data);
         this.newTask = "";
+        this.showMessage("Task added successfully!", "success");
       } catch (error) {
-        console.error("Error adding task:", error);
+        this.showMessage("Error adding task.", "error");
+        console.error(error);
       }
     },
     async toggleTask(task) {
       try {
         const response = await axios.put(`/api/tasks/${task.id}`);
         task.is_completed = response.data.is_completed;
+        this.showMessage("Task status updated successfully!", "success");
       } catch (error) {
-        console.error("Error toggling task:", error);
+        this.showMessage("Error updating task status.", "error");
+        console.error(error);
       }
     },
     async deleteTask(id) {
       try {
         await axios.delete(`/api/tasks/${id}`);
         this.tasks = this.tasks.filter((task) => task.id !== id);
+        this.showMessage("Task deleted successfully!", "success");
       } catch (error) {
-        console.error("Error deleting task:", error);
+        this.showMessage("Error deleting task.", "error");
+        console.error(error);
       }
     },
-    editTask(task) {
-      this.newTask = task.description;
-      this.deleteTask(task.id);
+    showMessage(text, type) {
+      this.message.text = text;
+      this.message.type = type;
+      setTimeout(() => {
+        this.message.text = "";
+      }, 3000); // Hide message after 3 seconds
     },
   },
   mounted() {
@@ -102,7 +125,7 @@ export default {
   width: 700px;
   text-align: center;
   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
-  margin-top:100px;
+  margin-top: 100px;
 }
 
 /* Title */
@@ -168,11 +191,9 @@ export default {
 }
 
 /* To-Do Actions */
-
 .todo-actions {
   width: 70px; /* Set a fixed width */
   display: flex;
-  /* justify-content: space-between; Ensure buttons are spaced out evenly */
 }
 
 .todo-actions button {
@@ -187,10 +208,6 @@ export default {
   color: #27ae60; /* Green for complete */
 }
 
-/* .edit-button {
-  color: #f1c40f; 
-} */
-
 .delete-button {
   color: #e74c3c; /* Red for delete */
 }
@@ -199,11 +216,26 @@ export default {
   color: #219150;
 }
 
-.edit-button:hover {
-  color: #d4ac0d;
-}
-
 .delete-button:hover {
   color: #c0392b;
+}
+
+/* Notifications */
+.notification {
+  margin-bottom: 20px;
+  padding: 10px;
+  border-radius: 5px;
+  text-align: center;
+  font-weight: bold;
+}
+
+.notification.success {
+  background-color: #2ecc71; /* Green */
+  color: white;
+}
+
+.notification.error {
+  background-color: #e74c3c; /* Red */
+  color: white;
 }
 </style>
