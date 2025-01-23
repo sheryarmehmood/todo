@@ -102,6 +102,7 @@ export default {
   width: 700px;
   text-align: center;
   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+  margin-top:100px;
 }
 
 /* Title */
@@ -167,6 +168,13 @@ export default {
 }
 
 /* To-Do Actions */
+
+.todo-actions {
+  width: 70px; /* Set a fixed width */
+  display: flex;
+  /* justify-content: space-between; Ensure buttons are spaced out evenly */
+}
+
 .todo-actions button {
   background-color: transparent;
   border: none;
