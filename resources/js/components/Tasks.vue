@@ -21,8 +21,8 @@
         <li v-for="task in tasks" :key="task.id" class="todo-item">
           <span :class="{ completed: task.is_completed }">{{ task.description }}</span>
           <div class="todo-actions">
-            <button class="complete-button" @click="toggleTask(task)">✔</button>
-            <button class="delete-button" @click="deleteTask(task.id)">🗑</button>
+            <button class="complete-button" @click="toggleTask(task)" title="Mark as completed">✔</button>
+            <button class="delete-button" @click="deleteTask(task.id)" title="Delete task">🗑</button>
           </div>
         </li>
       </ul>
@@ -41,7 +41,7 @@ export default {
       newTask: "",
       message: {
         text: "",
-        type: "", // 'success' or 'error'
+        type: "", 
       },
     };
   },
@@ -113,26 +113,34 @@ export default {
 </script>
 
 <style scoped>
+body{
+    margin:0 !important;
+}
 /* Full Page Green Background */
 .page-container {
-  background-color: #1abc9c; /* Green background */
-  min-height: 100vh; /* Full height of the viewport */
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 20px;
-  box-sizing: border-box;
+    background: url('/images/sunset.jpg');
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    box-sizing: border-box;
+    background-position: center bottom;
+    background-size: cover;
 }
 
 /* To-Do List Container */
 .todo-container {
-  background-color: #ecf0f1; /* Light grey background */
   padding: 30px;
   border-radius: 15px;
   width: 700px;
   text-align: center;
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
-  margin-top: 100px;
+  background: rgba(255, 255, 255, 0.1);
+    overflow: hidden;
+    border-top: 1px solid rgb(255 255 255 / 23%);
+    border-left: 1px solid rgb(255 255 255 / 19%);
+    backdrop-filter: blur(10px);
+
 }
 
 /* Title */
@@ -140,7 +148,7 @@ export default {
   font-size: 24px;
   font-weight: bold;
   margin-bottom: 20px;
-  color: #2c3e50; /* Dark text */
+  color: #000/* Dark text */
 }
 
 /* To-Do Form */
@@ -151,27 +159,34 @@ export default {
 }
 
 .todo-input {
-  padding: 10px;
-  flex: 1;
-  border: 1px solid #bdc3c7;
-  border-radius: 5px;
-  font-size: 16px;
-  margin-right: 10px;
+    padding: 10px;
+        flex: 1;
+        border: 1px solid #ffffff5c;
+        border-radius: 5px;
+        font-size: 16px;
+        margin-right: 10px;
+        background: transparent;
+        outline: none;
+        color: #ffffffe9;
+  &::placeholder{
+    color: #ffffff7c;
+  }
 }
 
-.add-button {
-  background-color: #8e44ad; /* Purple button */
-  color: white;
-  border: none;
-  border-radius: 10%;
-  width: 40px;
-  height: 40px;
-  font-size: 18px;
-  cursor: pointer;
+.add-button{
+    background-color: #ffffff33;
+    color: white;
+    border: none;
+    border-radius: 10%;
+    width: 45px;
+    height: 50px;
+    font-size: 18px;
+    cursor: pointer;
+    box-shadow: inset 0.2em 0.2em 0.2em 0 rgb(255 255 255 / 20%), inset -0.2em -0.2em 0.2em 0 rgb(0 0 0 / 20%);
 }
 
 .add-button:hover {
-  background-color: #732d91;
+  background-color: #00000026;
 }
 
 /* To-Do List */
@@ -182,19 +197,27 @@ export default {
 }
 
 .todo-item {
-  background-color: #ffffff; /* White background for items */
-  padding: 10px;
+  padding: 15px;
   border-radius: 5px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 10px;
-  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+        border-radius: 5px;
+        font-size: 16px;
+        margin-right: 10px;
+        background: #ffffff33;
+        outline: none;
+        color: #ffffffe9;
+        box-shadow: inset 0.2em 0.2em 0.2em 0 rgb(255 255 255 / 20%), inset -0.2em -0.2em 0.2em 0 rgb(0 0 0 / 20%) ;
+        &:hover{
+            background: #00000026;
+        }
 }
 
 .todo-item .completed {
   text-decoration: line-through;
-  color: #7f8c8d; /* Grey color for completed tasks */
+  color: #000;
 }
 
 /* To-Do Actions */
@@ -204,19 +227,19 @@ export default {
 }
 
 .todo-actions button {
-  background-color: transparent;
-  border: none;
-  font-size: 18px;
-  cursor: pointer;
-  margin-left: 5px;
+    background-color: transparent;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    margin-left: 0px;
 }
 
 .complete-button {
-  color: #27ae60; /* Green for complete */
+  color: #27ae60; 
 }
 
 .delete-button {
-  color: #e74c3c; /* Red for delete */
+    color: #ff1800;
 }
 
 .complete-button:hover {
@@ -237,12 +260,15 @@ export default {
 }
 
 .notification.success {
-  background-color: #2ecc71; /* Green */
   color: white;
+background: rgba(0, 0, 0, 0.44);
+box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+backdrop-filter: blur(12px);
+-webkit-backdrop-filter: blur(12px);
 }
 
 .notification.error {
-  background-color: #e74c3c; /* Red */
+  background-color: #e74c3c; 
   color: white;
 }
 </style>
