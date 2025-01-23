@@ -10,24 +10,36 @@ class TaskController extends Controller
     // Get all tasks
     public function index()
     {
-        // return response()->json(Task::orderBy('created_at', 'desc')->get());
         return response()->json(Task::all());
     }
 
     // Add a new task
     public function store(Request $request)
-    {
-        try {
-            $request->validate([
+{
+    try {
+        // Validate the request with custom error messages
+        $request->validate(
+            [
                 'description' => 'required|string|max:255',
-            ]);
+            ],
+            [
+                'description.required' => 'The task description is needed.',
+                'description.string' => 'The task description must be a string.',
+                'description.max' => 'The task description may not exceed 255 characters.',
+            ]
+        );
 
-            $task = Task::create(['description' => $request->description]);
-            return response()->json($task, 201);
-        } catch (\Exception $e) {
-            return response()->json(['error' => 'Task creation failed!'], 500);
-        }
+        // Create the task if validation passes
+        $task = Task::create(['description' => $request->description]);
+        return response()->json($task, 201);
+    } catch (\Illuminate\Validation\ValidationException $e) {
+        // Let Laravel handle the validation response (optional, added for clarity)
+        throw $e;
+    } catch (\Exception $e) {
+        // Handle all other exceptions
+        return response()->json(['error' => 'Task creation failed!'], 500);
     }
+}
 
     // Update task status
     public function update(Request $request, Task $task)

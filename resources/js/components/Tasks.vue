@@ -57,20 +57,29 @@ export default {
       }
     },
     async addTask() {
-      if (!this.newTask.trim()) {
-        this.showMessage("Task description cannot be empty.", "error");
-        return;
-      }
-      try {
-        const response = await axios.post("/api/tasks", { description: this.newTask });
-        this.tasks.push(response.data);
-        this.newTask = "";
-        this.showMessage("Task added successfully!", "success");
-      } catch (error) {
-        this.showMessage("Error adding task.", "error");
-        console.error(error);
-      }
+        if (!this.newTask.trim()) {
+            this.showMessage("Task description cannot be empty.", "error");
+            return;
+        }
+        try {
+            const response = await axios.post("/api/tasks", { description: this.newTask });
+            this.tasks.push(response.data);
+            this.newTask = "";
+            this.showMessage("Task added successfully!", "success");
+        } catch (error) {
+            if (error.response && error.response.status === 422) {
+            // Handle validation errors
+            const validationErrors = error.response.data.errors;
+            console.log(validationErrors);
+                if (validationErrors.description) {
+                this.showMessage(validationErrors.description[0], "error"); // Display the first error
+            }
+            } else {
+            this.showMessage("An unexpected error occurred while adding the task.", "error");
+            }
+        }
     },
+
     async toggleTask(task) {
       try {
         const response = await axios.put(`/api/tasks/${task.id}`);
@@ -78,7 +87,6 @@ export default {
         this.showMessage("Task status updated successfully!", "success");
       } catch (error) {
         this.showMessage("Error updating task status.", "error");
-        console.error(error);
       }
     },
     async deleteTask(id) {
@@ -88,7 +96,6 @@ export default {
         this.showMessage("Task deleted successfully!", "success");
       } catch (error) {
         this.showMessage("Error deleting task.", "error");
-        console.error(error);
       }
     },
     showMessage(text, type) {
@@ -192,7 +199,7 @@ export default {
 
 /* To-Do Actions */
 .todo-actions {
-  width: 70px; /* Set a fixed width */
+  width: 60px; /* Set a fixed width */
   display: flex;
 }
 
