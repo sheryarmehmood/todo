@@ -13,16 +13,19 @@ class TaskController extends Controller
         return response()->json(Task::all());
     }
 
-    // Add a new task
     public function store(Request $request)
 {
     try {
         // Validate the request with custom error messages
         $request->validate(
             [
+                'title' => 'required|string|max:255',
                 'description' => 'required|string|max:255',
             ],
             [
+                'title.required' => 'The task title is needed.',
+                'title.string' => 'The task title must be a string.',
+                'title.max' => 'The task title may not exceed 255 characters.',
                 'description.required' => 'The task description is needed.',
                 'description.string' => 'The task description must be a string.',
                 'description.max' => 'The task description may not exceed 255 characters.',
@@ -30,7 +33,11 @@ class TaskController extends Controller
         );
 
         // Create the task if validation passes
-        $task = Task::create(['description' => $request->description]);
+        $task = Task::create([
+            'title' => $request->title,
+            'description' => $request->description,
+        ]);
+
         return response()->json($task, 201);
     } catch (\Illuminate\Validation\ValidationException $e) {
         // Let Laravel handle the validation response (optional, added for clarity)

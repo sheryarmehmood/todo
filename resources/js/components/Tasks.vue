@@ -3,40 +3,90 @@
     <div class="todo-container">
       <h1 class="title">ToDo List!</h1>
 
+
       <!-- Notification Section -->
       <div v-if="message.text" :class="`notification ${message.type}`">
         {{ message.text }}
       </div>
 
-      <form @submit.prevent="addTask" class="todo-form">
-        <input
-          v-model="newTask"
-          type="text"
-          placeholder="Add your new ToDo..."
-          class="todo-input"
-        />
-        <button type="submit" class="add-button">+</button>
-      </form>
+
+       <!-- Add Task Button -->
+       <button @click="openAddModal" class="add-button">+</button>
+
+
+     
       <ul class="todo-list">
        
         <li v-for="task in tasks" :key="task.id" class="todo-item">
   <span :class="{ completed: task.is_completed }">{{ task.description }}</span>
   <div class="todo-actions">
-    <button 
-      class="complete-button" 
-      @click="toggleTask(task)" 
+    <button
+      class="complete-button"
+      @click="toggleTask(task)"
       :title="task.is_completed ? 'Mark as incomplete' : 'Mark as completed'"
     >
     <i :class="task.is_completed ? 'fas fa-undo' : 'fas fa-check'"></i>
+    </button>
+    <button
+              class="view-button"
+              @click="openViewModal(task)"
+              title="View task"
+            >
+              👁
     </button>
     <button class="delete-button" @click="deleteTask(task.id)" title="Delete task">🗑</button>
   </div>
 </li>
 
+
       </ul>
+
+
+    <!-- Add Task Modal -->
+    <div v-if="showAddModal" class="modal">
+      <div class="modal-content">
+        <h2>Add Task</h2>
+        <form @submit.prevent="addTask">
+          <input
+            v-model="newTask.title"
+            type="text"
+            placeholder="Task Title"
+            required
+          />
+          <textarea
+            v-model="newTask.description"
+            placeholder="Task Description"
+            required
+          ></textarea>
+          <div class="modal-buttons">
+            <button type="submit" class="add-task-button">Add Task</button>
+            <button type="button" @click="closeAddModal" class="cancel-button">
+              Cancel
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+
+      <!-- View Task Modal -->
+    <div v-if="showViewModal" class="modal">
+      <div class="modal-content">
+        <h2>Task Details</h2>
+        <p><strong>Title:</strong> {{ currentTask.title }}</p>
+        <p><strong>Description:</strong> {{ currentTask.description }}</p>
+        <button type="button" @click="closeViewModal" class="close-button">
+          Close
+        </button>
+      </div>
+    </div>
     </div>
   </div>
 </template>
+
+
+
+
 
 
 
@@ -46,15 +96,20 @@ import axios from "axios";
 import '@fortawesome/fontawesome-free/css/all.css';
 
 
+
+
 export default {
   name: "Tasks",
   data() {
-    return {
+     return {
       tasks: [],
-      newTask: "",
+      newTask: { title: "", description: "" },
+      currentTask: {},
+      showAddModal: false,
+      showViewModal: false,
       message: {
         text: "",
-        type: "", 
+        type: "",
       },
     };
   },
@@ -69,29 +124,36 @@ export default {
         console.error(error);
       }
     },
+    
+
     async addTask() {
-        if (!this.newTask.trim()) {
-            this.showMessage("Task description cannot be empty.", "error");
-            return;
-        }
-        try {
-            const response = await axios.post("/api/tasks", { description: this.newTask });
-            this.tasks.push(response.data);
-            this.newTask = "";
-            this.showMessage("Task added successfully!", "success");
-        } catch (error) {
+      if (!this.newTask.title || !this.newTask.description) {
+        this.showMessage("All fields are required.", "error");
+        return;
+      }
+      try {
+        const response = await axios.post("/api/tasks", this.newTask);
+        this.tasks.push(response.data);
+        this.newTask = { title: "", description: "" };
+        this.closeAddModal();
+        this.showMessage("Task added successfully!", "success");
+      } catch (error) {
             if (error.response && error.response.status === 422) {
+              this.closeAddModal();
             // Handle validation errors
             const validationErrors = error.response.data.errors;
             console.log(validationErrors);
-                if (validationErrors.description) {
-                this.showMessage(validationErrors.description[0], "error"); // Display the first error
-            }
+            if (validationErrors.title) {
+        this.showMessage(validationErrors.title[0], "error"); // Display title error
+      } else if (validationErrors.description) {
+        this.showMessage(validationErrors.description[0], "error"); // Display description error
+      }
             } else {
             this.showMessage("An unexpected error occurred while adding the task.", "error");
             }
         }
     },
+
 
     async toggleTask(task) {
       try {
@@ -118,12 +180,28 @@ export default {
         this.message.text = "";
       }, 3000); // Hide message after 3 seconds
     },
+    openAddModal() {
+      this.showAddModal = true;
+    },
+    closeAddModal() {
+      this.showAddModal = false;
+      this.newTask = { title: "", description: "" };
+    },
+    openViewModal(task) {
+      this.currentTask = task;
+      this.showViewModal = true;
+    },
+    closeViewModal() {
+      this.showViewModal = false;
+      this.currentTask = {};
+    },
   },
   mounted() {
     this.fetchTasks();
   },
 };
 </script>
+
 
 <style scoped>
 body{
@@ -142,6 +220,7 @@ body{
     background-size: cover;
 }
 
+
 /* To-Do List Container */
 .todo-container {
   padding: 30px;
@@ -154,7 +233,9 @@ body{
     border-left: 1px solid rgb(255 255 255 / 19%);
     backdrop-filter: blur(10px);
 
+
 }
+
 
 /* Title */
 .title {
@@ -164,12 +245,14 @@ body{
   color: #fff;
 }
 
+
 /* To-Do Form */
 .todo-form {
   display: flex;
   justify-content: space-between;
   margin-bottom: 20px;
 }
+
 
 .todo-input {
     padding: 10px;
@@ -186,6 +269,7 @@ body{
   }
 }
 
+
 .add-button{
     background-color: #ffffff33;
     color: white;
@@ -198,9 +282,11 @@ body{
     box-shadow: inset 0.2em 0.2em 0.2em 0 rgb(255 255 255 / 20%), inset -0.2em -0.2em 0.2em 0 rgb(0 0 0 / 20%);
 }
 
+
 .add-button:hover {
   background-color: #00000026;
 }
+
 
 /* To-Do List */
 .todo-list {
@@ -208,6 +294,7 @@ body{
   padding: 0;
   margin: 0;
 }
+
 
 .todo-item {
   padding: 15px;
@@ -228,16 +315,19 @@ body{
         }
 }
 
+
 .todo-item .completed {
   text-decoration: line-through;
   color: #000;
 }
+
 
 /* To-Do Actions */
 .todo-actions {
   width: 60px; /* Set a fixed width */
   display: flex;
 }
+
 
 .todo-actions button {
     background-color: transparent;
@@ -247,13 +337,18 @@ body{
     margin-left: 0px;
 }
 
+
 .complete-button {
-  color: #fff; 
+  color: #fff;
 }
+
 
 .delete-button {
     color: #fff;
 }
+
+
+
 
 
 
@@ -266,6 +361,7 @@ body{
   font-weight: bold;
 }
 
+
 .notification.success {
   color: white;
 background: rgba(0, 0, 0, 0.44);
@@ -274,8 +370,70 @@ backdrop-filter: blur(12px);
 -webkit-backdrop-filter: blur(12px);
 }
 
+
 .notification.error {
-  background-color: #e74c3c; 
+  background-color: #e74c3c;
   color: white;
 }
+
+
+/* Modal Styles */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+
+.modal-content {
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  width: 400px;
+  text-align: center;
+}
+
+
+.modal-content input,
+.modal-content textarea {
+  width: 100%;
+  margin-bottom: 10px;
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+
+.modal-buttons {
+  display: flex;
+  justify-content: space-between;
+}
+
+
+.add-task-button {
+  background: #0ca41f;
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+
+.cancel-button,
+.close-button {
+  background: #da1417;
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 5px;
+}
 </style>
+
+
+
