@@ -12,6 +12,7 @@ class TaskFactory extends Factory
     public function definition()
     {
         return [
+            'title' => $this->faker->word(),
             'description' => $this->faker->sentence(), // Generate a random sentence
             'is_completed' => $this->faker->boolean(), // Random true/false
         ];
