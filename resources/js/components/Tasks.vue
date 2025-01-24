@@ -18,25 +18,25 @@
       <ul class="todo-list">
        
         <li v-for="task in tasks" :key="task.id" class="todo-item">
-  <span :class="{ completed: task.is_completed }">{{ task.description }}</span>
-  <div class="todo-actions">
-    <button
-      class="complete-button"
-      @click="toggleTask(task)"
-      :title="task.is_completed ? 'Mark as incomplete' : 'Mark as completed'"
-    >
-    <i :class="task.is_completed ? 'fas fa-undo' : 'fas fa-check'"></i>
-    </button>
-    <button
-              class="view-button"
-              @click="openViewModal(task)"
-              title="View task"
+          <span :class="{ completed: task.is_completed }">{{ task.description }}</span>
+          <div class="todo-actions">
+            <button
+              class="complete-button"
+              @click="toggleTask(task)"
+              :title="task.is_completed ? 'Mark as incomplete' : 'Mark as completed'"
             >
-              👁
-    </button>
-    <button class="delete-button" @click="deleteTask(task.id)" title="Delete task">🗑</button>
-  </div>
-</li>
+            <i :class="task.is_completed ? 'fas fa-undo' : 'fas fa-check'"></i>
+            </button>
+            <button
+                      class="view-button"
+                      @click="openViewModal(task)"
+                      title="View task"
+                    >
+                      👁
+            </button>
+            <button class="delete-button" @click="deleteTask(task.id)" title="Delete task">🗑</button>
+          </div>
+        </li>
 
 
       </ul>
@@ -46,6 +46,9 @@
     <div v-if="showAddModal" class="modal">
       <div class="modal-content">
         <h2>Add Task</h2>
+        <div v-if="validationmessage.text" :class="`notification ${validationmessage.type}`">
+        {{ validationmessage.text }}
+      </div>
         <form @submit.prevent="addTask">
           <input
             v-model="newTask.title"
@@ -86,17 +89,9 @@
 
 
 
-
-
-
-
-
 <script>
 import axios from "axios";
 import '@fortawesome/fontawesome-free/css/all.css';
-
-
-
 
 export default {
   name: "Tasks",
@@ -108,6 +103,10 @@ export default {
       showAddModal: false,
       showViewModal: false,
       message: {
+        text: "",
+        type: "",
+      },
+      validationmessage: {
         text: "",
         type: "",
       },
@@ -139,14 +138,14 @@ export default {
         this.showMessage("Task added successfully!", "success");
       } catch (error) {
             if (error.response && error.response.status === 422) {
-              this.closeAddModal();
+              // this.closeAddModal();
             // Handle validation errors
             const validationErrors = error.response.data.errors;
             console.log(validationErrors);
             if (validationErrors.title) {
-        this.showMessage(validationErrors.title[0], "error"); // Display title error
+        this.showValidationMessage(validationErrors.title[0], "error"); // Display title error
       } else if (validationErrors.description) {
-        this.showMessage(validationErrors.description[0], "error"); // Display description error
+        this.showValidationMessage(validationErrors.description[0], "error"); // Display description error
       }
             } else {
             this.showMessage("An unexpected error occurred while adding the task.", "error");
@@ -178,6 +177,13 @@ export default {
       this.message.type = type;
       setTimeout(() => {
         this.message.text = "";
+      }, 3000); // Hide message after 3 seconds
+    },
+    showValidationMessage(text, type) {
+      this.validationmessage.text = text;
+      this.validationmessage.type = type;
+      setTimeout(() => {
+        this.validationmessage.text = "";
       }, 3000); // Hide message after 3 seconds
     },
     openAddModal() {
