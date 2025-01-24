@@ -18,20 +18,33 @@
         <button type="submit" class="add-button">+</button>
       </form>
       <ul class="todo-list">
+       
         <li v-for="task in tasks" :key="task.id" class="todo-item">
-          <span :class="{ completed: task.is_completed }">{{ task.description }}</span>
-          <div class="todo-actions">
-            <button class="complete-button" @click="toggleTask(task)" title="Mark as completed">✔</button>
-            <button class="delete-button" @click="deleteTask(task.id)" title="Delete task">🗑</button>
-          </div>
-        </li>
+  <span :class="{ completed: task.is_completed }">{{ task.description }}</span>
+  <div class="todo-actions">
+    <button 
+      class="complete-button" 
+      @click="toggleTask(task)" 
+      :title="task.is_completed ? 'Mark as incomplete' : 'Mark as completed'"
+    >
+    <i :class="task.is_completed ? 'fas fa-undo' : 'fas fa-check'"></i>
+    </button>
+    <button class="delete-button" @click="deleteTask(task.id)" title="Delete task">🗑</button>
+  </div>
+</li>
+
       </ul>
     </div>
   </div>
 </template>
 
+
+
+
 <script>
 import axios from "axios";
+import '@fortawesome/fontawesome-free/css/all.css';
+
 
 export default {
   name: "Tasks",
@@ -135,7 +148,7 @@ body{
   border-radius: 15px;
   width: 700px;
   text-align: center;
-  background: rgba(255, 255, 255, 0.1);
+  background: rgb(0 0 0 / 29%);
     overflow: hidden;
     border-top: 1px solid rgb(255 255 255 / 23%);
     border-left: 1px solid rgb(255 255 255 / 19%);
@@ -148,7 +161,7 @@ body{
   font-size: 24px;
   font-weight: bold;
   margin-bottom: 20px;
-  color: #000/* Dark text */
+  color: #fff;
 }
 
 /* To-Do Form */
@@ -235,20 +248,14 @@ body{
 }
 
 .complete-button {
-  color: #27ae60; 
+  color: #fff; 
 }
 
 .delete-button {
-    color: #ff1800;
+    color: #fff;
 }
 
-.complete-button:hover {
-  color: #219150;
-}
 
-.delete-button:hover {
-  color: #c0392b;
-}
 
 /* Notifications */
 .notification {
