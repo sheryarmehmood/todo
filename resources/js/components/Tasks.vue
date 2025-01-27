@@ -11,7 +11,9 @@
 
 
        <!-- Add Task Button -->
-       <button @click="openAddModal" class="add-button">+</button>
+       <button @click="openAddModal" class="add-button">
+        <i class="fa-solid fa-plus"></i>
+       </button>
 
 
      
@@ -32,9 +34,15 @@
                       @click="openViewModal(task)"
                       title="View task"
                     >
-                      👁
+                    <i class="fa-regular fa-eye"></i>
             </button>
-            <button class="delete-button" @click="deleteTask(task.id)" title="Delete task">🗑</button>
+            <button 
+                      class="delete-button" 
+                      @click="deleteTask(task.id)" 
+                      title="Delete task"
+                      >
+                      <i class="fa-solid fa-trash"></i>
+            </button>
           </div>
         </li>
 
@@ -137,7 +145,7 @@ export default {
         this.closeAddModal();
         this.showMessage("Task added successfully!", "success");
       } catch (error) {
-            if (error.response && error.response.status === 422) {
+            if (error.response && error.response.status === 422) { 
               // this.closeAddModal();
             // Handle validation errors
             const validationErrors = error.response.data.errors;
@@ -211,7 +219,9 @@ export default {
 
 <style scoped>
 body{
-    margin:0 !important;
+    margin: 0 !important;
+    padding: 0;
+    box-sizing: border-box;
 }
 /* Full Page Green Background */
 .page-container {
@@ -245,10 +255,12 @@ body{
 
 /* Title */
 .title {
+  font-family: "Roboto", serif;
   font-size: 24px;
   font-weight: bold;
   margin-bottom: 20px;
   color: #fff;
+  display: inline-block;
 }
 
 
@@ -266,6 +278,7 @@ body{
         border: 1px solid #ffffff5c;
         border-radius: 5px;
         font-size: 16px;
+        font-family: "Roboto", serif;
         margin-right: 10px;
         background: transparent;
         outline: none;
@@ -284,13 +297,18 @@ body{
     width: 45px;
     height: 50px;
     font-size: 18px;
+    font-family: "Roboto", serif;
     cursor: pointer;
+    background-color: #28a745;
     box-shadow: inset 0.2em 0.2em 0.2em 0 rgb(255 255 255 / 20%), inset -0.2em -0.2em 0.2em 0 rgb(0 0 0 / 20%);
+    position: absolute;
+    top: 37px;
+    right: 30px;
 }
 
 
 .add-button:hover {
-  background-color: #00000026;
+  background-color: #218838;
 }
 
 
@@ -311,7 +329,7 @@ body{
   margin-bottom: 10px;
         border-radius: 5px;
         font-size: 16px;
-        margin-right: 10px;
+        font-family: "Roboto", serif;
         background: #ffffff33;
         outline: none;
         color: #ffffffe9;
@@ -324,21 +342,22 @@ body{
 
 .todo-item .completed {
   text-decoration: line-through;
-  color: #000;
+  font-weight: bold;
 }
 
 
 /* To-Do Actions */
 .todo-actions {
-  width: 60px; /* Set a fixed width */
+  width: 100px; /* Set a fixed width */
   display: flex;
+  justify-content: flex-end;
 }
 
 
 .todo-actions button {
     background-color: transparent;
     border: none;
-    font-size: 24px;
+    font-size: 15px;
     cursor: pointer;
     margin-left: 0px;
 }
@@ -353,9 +372,9 @@ body{
     color: #fff;
 }
 
-
-
-
+.view-button{
+  color: #fff;
+}
 
 
 /* Notifications */
@@ -365,15 +384,16 @@ body{
   border-radius: 5px;
   text-align: center;
   font-weight: bold;
+  font-family: "Roboto", serif;
 }
 
 
 .notification.success {
   color: white;
-background: rgba(0, 0, 0, 0.44);
-box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-backdrop-filter: blur(12px);
--webkit-backdrop-filter: blur(12px);
+  background: rgba(0, 0, 0, 0.44);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
 
@@ -390,7 +410,8 @@ backdrop-filter: blur(12px);
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.7);
+  /* background: rgba(0, 0, 0, 0.7); */
+  background: #ffffff33;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -398,27 +419,33 @@ backdrop-filter: blur(12px);
 
 
 .modal-content {
-  background: #fff;
+  /* background: #fff; */
+  /* background: #ffffff33; */
+  background: #4d0000;
   padding: 20px;
   border-radius: 8px;
   width: 400px;
   text-align: center;
+  color: #ffffffe9;
+  font-family: "Roboto", serif;
 }
 
 
 .modal-content input,
 .modal-content textarea {
-  width: 100%;
+  width: 95%;
   margin-bottom: 10px;
   padding: 10px;
   border-radius: 5px;
   border: 1px solid #ccc;
+  font-family: "Roboto", serif;
 }
 
 
 .modal-buttons {
   display: flex;
   justify-content: space-between;
+  font-family: "Roboto", serif;
 }
 
 
@@ -427,7 +454,13 @@ backdrop-filter: blur(12px);
   color: white;
   border: none;
   padding: 10px;
+  font-family: "Roboto", serif;
   border-radius: 5px;
+}
+
+
+.add-task-button:hover {
+  cursor: pointer;
 }
 
 
@@ -438,6 +471,17 @@ backdrop-filter: blur(12px);
   border: none;
   padding: 10px;
   border-radius: 5px;
+  font-family: "Roboto", serif;
+}
+
+
+.cancel-button:hover {
+  cursor: pointer;
+} 
+
+
+.close-button:hover {
+  cursor: pointer;
 }
 </style>
 
